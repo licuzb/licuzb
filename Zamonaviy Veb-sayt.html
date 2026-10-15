@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquid Chrome Experience</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #030303;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Interactive Gyroscope / Mouse Background Wrapper using user image */
+        .bg-container {
+            position: fixed;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            z-index: -2;
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.7) contrast(1.15);
+            transition: transform 0.1s ease-out;
+            will-change: transform;
+        }
+
+        /* Overlay canvas for liquid particle ripple effect */
+        #liquidCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(15, 15, 20, 0.45);
+            backdrop-filter: blur(24px) saturate(220%);
+            -webkit-backdrop-filter: blur(24px) saturate(220%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 35px 70px rgba(0, 0, 0, 0.7),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            border-radius: 28px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glass-panel:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 45px 90px rgba(0, 0, 0, 0.9),
+                        0 0 50px rgba(255, 255, 255, 0.35),
+                        inset 0 1px 2px rgba(255, 255, 255, 0.6);
+        }
+
+        .liquid-btn {
+            position: relative;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(16px);
+            border-radius: 50px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .liquid-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .liquid-btn:hover::before {
+            left: 100%;
+        }
+
+        .liquid-btn:hover {
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.7);
+            transform: scale(1.06);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .chrome-text {
+            background: linear-gradient(180deg, #FFFFFF 0%, #A1A1A1 50%, #E2E2E2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.25);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <div class="bg-container" id="bgParallax"></div>
+
+    <canvas id="liquidCanvas"></canvas>
+
+    <header class="sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto glass-panel px-6 py-3 flex justify-between items-center">
+            <h1 class="text-2xl font-extrabold tracking-wider chrome-text uppercase">LICUZB</h1>
+            <nav class="hidden md:flex space-x-8 text-sm font-medium">
+                <a href="#hero" class="hover:text-white text-gray-300 transition-colors">Bosh sahifa</a>
+                <a href="#about" class="hover:text-white text-gray-300 transition-colors">PUBG Mobile</a>
+                <a href="#tournaments" class="hover:text-white text-gray-300 transition-colors">Turnirlar</a>
+                <a href="#contact" class="hover:text-white text-gray-300 transition-colors">Aloqa</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-6 w-full flex flex-col justify-center">
+        <section id="hero" class="py-20 text-center flex flex-col items-center">
+            <div class="inline-block glass-panel px-4 py-1.5 mb-6 text-xs tracking-widest uppercase text-gray-300 border border-white/20">
+                PUBG Mobile Uzbekistan
+            </div>
+            <h2 class="text-5xl md:0.5xl font-extrabold chrome-text mb-6 leading-tight">
+                LICUZB PUBG MOBILE
+            </h2>
+            <p class="max-w-2xl text-lg text-gray-300 mb-8 font-light">
+                O'zbekistondagi eng kuchli PUBG Mobile geymerlari, kiber-sport turnirlari va taktik tahlillar makoni. Winner Winner Chicken Dinner!
+            </p>
+            <div class="flex gap-4">
+                <a href="#tournaments" class="glass-panel px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white hover:bg-white/10 transition">
+                    Turnirlar
+                </a>
+            </div>
+        </section>
+
+        <section id="about" class="py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass-panel p-8 flex flex-col items-start">
+                <div class="w-12 h-12 mb-6 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <h3 class="text-xl font-bold chrome-text mb-3">Professional Turnirlar</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">
+                    Eksklyuziv Custom Room va Scrim o'yinlari. PMCO, PMSL va rasmiy musobaqalarga tayyorgarlik markazi.
+                </p>
+            </div>
+
+            <div class="glass-panel p-8 flex flex-col items-start">
+                <div class="w-12 h-12 mb-6 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                </div>
+                <h3 class="text-xl font-bold chrome-text mb-3">Taktika va Xaritalar</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">
+                    Erangel, Miramar va Sanhok xaritalarida to'g'ri rotatsiya, zonani egallash va professional spray otish sirlari.
+                </p>
+            </div>
+
+            <div class="glass-panel p-8 flex flex-col items-start">
+                <div class="w-12 h-12 mb-6 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                </div>
+                <h3 class="text-xl font-bold chrome-text mb-3">Klan va Komanda</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">
+                    LICUZB klaniga qo'shiling. O'zingizga doimiy squad, fragger va sniper sheriklar toping.
+                </p>
+            </div>
+        </section>
+
+        <section id="tournaments" class="py-12">
+            <div class="glass-panel p-8 text-center max-w-4xl mx-auto">
+                <h3 class="text-3xl font-extrabold chrome-text mb-6">LICUZB PUBG STATS</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 my-6">
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+                        <span class="block text-3xl font-bold text-yellow-400">58</span>
+                        <span class="text-xs text-gray-400 uppercase tracking-wider">O'ldirishlar (Kills)</span>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+                        <span class="block text-3xl font-bold text-yellow-400">8582</span>
+                        <span class="text-xs text-gray-400 uppercase tracking-wider">Zarar (Damage)</span>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+                        <span class="block text-3xl font-bold text-yellow-400">MVP</span>
+                        <span class="text-xs text-gray-400 uppercase tracking-wider">Mavqe</span>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+                        <span class="block text-3xl font-bold text-yellow-400">#1</span>
+                        <span class="text-xs text-gray-400 uppercase tracking-wider">Chicken Dinner</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="contact" class="py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-6 text-center text-gray-500 text-xs">
+            <p>&copy; 2026 LICUZB PUBG MOBILE. Barcha huquqlar himoyalangan.</p>
+        </div>
+    </footer>
+
+    <script>
+        const bg = document.getElementById('bgParallax');
+        
+        // Use user's uploaded image directly as background
+        bg.style.backgroundImage = `url('1000016441.jpg')`;
+
+        let currentX = 0, currentY = 0;
+        let targetX = 0, targetY = 0;
+
+        function animateParallax() {
+            currentX += (targetX - currentX) * 0.05;
+            currentY += (targetY - currentY) * 0.05;
+            
+            bg.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) scale(1.08)`;
+            requestAnimationFrame(animateParallax);
+        }
+        animateParallax();
+
+        window.addEventListener('mousemove', (e) => {
+            const cx = window.innerWidth / 2;
+            const cy = window.innerHeight / 2;
+            targetX = (e.clientX - cx) * 0.05;
+            targetY = (e.clientY - cy) * 0.05;
+        });
+
+        function handleOrientation(e) {
+            let gamma = e.gamma || 0;
+            let beta = e.beta || 0;
+            gamma = Math.max(-45, Math.min(45, gamma));
+            beta = Math.max(-45, Math.min(45, beta));
+            targetX = gamma * 1.5;
+            targetY = beta * 1.5;
+        }
+
+        function requestGyroPermission() {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(response => {
+                        if (response === 'granted') {
+                            window.addEventListener('deviceorientation', handleOrientation);
+                        }
+                    })
+                    .catch(console.error);
+            } else if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+        }
+
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', handleOrientation);
+        }
+
+        const canvas = document.getElementById('liquidCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class LiquidParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 25 + 10;
+                this.alpha = 0.6;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = (Math.random() - 0.5) * 2;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= 0.01;
+                this.size += 0.4;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha * 0.15})`;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.3) {
+                particles.push(new LiquidParticle(e.clientX, e.clientY));
+            }
+        });
+
+        function triggerLiquidEffect() {
+            const cx = window.innerWidth / 2;
+            const cy = window.innerHeight / 3;
+            for (let i = 0; i < 40; i++) {
+                particles.push(new LiquidParticle(cx + (Math.random() - 0.5) * 200, cy + (Math.random() - 0.5) * 200));
+            }
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].alpha <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+    </script>
+</body>
+</html>
